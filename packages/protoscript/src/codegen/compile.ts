@@ -29,9 +29,18 @@ export async function compile(
   async function writeFile(name: string, content: string) {
     const file = new CodeGeneratorResponse.File();
     file.setName(name);
-    file.setContent(
-      await format(content, { parser: isTypescript ? "typescript" : "babel" }),
-    );
+    let js;
+    try {
+      js = await format(content, {
+        parser: isTypescript ? "typescript" : "babel",
+      });
+    } catch (e) {
+      console.error(name + "\n" + content + "\n", e);
+      process.exit(1);
+      return;
+    }
+    file.setContent(js);
+
     response.addFile(file);
   }
 

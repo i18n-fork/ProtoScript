@@ -122,32 +122,32 @@ export function getDescriptor(
     }
     case FieldDescriptorProto.Type.TYPE_INT64: {
       return {
-        defaultValue: "0n",
+        defaultValue: "0",
         jsonSerializer: "String",
         jsonParser: "BigInt",
         map: false,
         optional,
-        read: "readInt64String",
-        readPacked: "readPackedInt64String",
+        read: "readInt64",
+        readPacked: "readPackedInt64",
         repeated,
-        tsType: "bigint",
-        tsTypeJSON: "bigint",
-        write: repeated ? "writePackedInt64String" : "writeInt64String",
+        tsType: "number",
+        tsTypeJSON: "number",
+        write: repeated ? "writePackedInt64" : "writeInt64",
       };
     }
     case FieldDescriptorProto.Type.TYPE_UINT64: {
       return {
-        defaultValue: "0n",
+        defaultValue: "0",
         jsonSerializer: "String",
         jsonParser: "BigInt",
         map: false,
         optional,
-        read: "readUint64String",
-        readPacked: "readPackedUint64String",
+        read: "readUint64",
+        readPacked: "readPackedUint64",
         repeated,
-        tsType: "bigint",
-        tsTypeJSON: "bigint",
-        write: repeated ? "writePackedUint64String" : "writeUint64String",
+        tsType: "number",
+        tsTypeJSON: "number",
+        write: repeated ? "writePackedUint64" : "writeUint64",
       };
     }
     case FieldDescriptorProto.Type.TYPE_INT32: {
@@ -167,17 +167,17 @@ export function getDescriptor(
     }
     case FieldDescriptorProto.Type.TYPE_FIXED64: {
       return {
-        defaultValue: "0n",
+        defaultValue: "0",
         jsonSerializer: "String",
         jsonParser: "BigInt",
         map: false,
         optional,
-        read: "readFixed64String",
-        readPacked: "readPackedFixed64String",
+        read: "readFixed64",
+        readPacked: "readPackedFixed64",
         repeated,
-        tsType: "bigint",
-        tsTypeJSON: "bigint",
-        write: repeated ? "writePackedFixed64String" : "writeFixed64String",
+        tsType: "number",
+        tsTypeJSON: "number",
+        write: repeated ? "writePackedFixed64" : "writeFixed64",
       };
     }
     case FieldDescriptorProto.Type.TYPE_ENUM: {
@@ -202,7 +202,7 @@ export function getDescriptor(
       }
 
       return {
-        defaultValue: `${name}._fromInt(0)`,
+        defaultValue: "0",
         jsonSerializer: "identity",
         jsonParser: `${name}._fromInt`,
         map: false,
@@ -342,7 +342,7 @@ export function getDescriptor(
     }
     case FieldDescriptorProto.Type.TYPE_BYTES: {
       return {
-        defaultValue: "new Uint8Array()",
+        defaultValue: "EMPTY_BIN",
         jsonSerializer: "protoscript.serializeBytes",
         jsonParser: "protoscript.parseBytes",
         map: false,
@@ -387,17 +387,17 @@ export function getDescriptor(
     }
     case FieldDescriptorProto.Type.TYPE_SFIXED64: {
       return {
-        defaultValue: "0n",
+        defaultValue: "0",
         jsonSerializer: "String",
         jsonParser: "BigInt",
         map: false,
         optional,
-        read: "readSfixed64String",
-        readPacked: "readPackedSfixed64String",
+        read: "readSfixed64",
+        readPacked: "readPackedSfixed64",
         repeated,
-        tsType: "bigint",
-        tsTypeJSON: "bigint",
-        write: repeated ? "writePackedSfixed64String" : "writeSfixed64String",
+        tsType: "number",
+        tsTypeJSON: "number",
+        write: repeated ? "writePackedSfixed64" : "writeSfixed64",
       };
     }
     case FieldDescriptorProto.Type.TYPE_SINT32: {
@@ -417,17 +417,17 @@ export function getDescriptor(
     }
     case FieldDescriptorProto.Type.TYPE_SINT64: {
       return {
-        defaultValue: "0n",
+        defaultValue: "0",
         jsonSerializer: "String",
         jsonParser: "BigInt",
         map: false,
         optional,
-        read: "readSint64String",
-        readPacked: "readPackedSint64String",
+        read: "readSint64",
+        readPacked: "readPackedSint64",
         repeated,
-        tsType: "bigint",
-        tsTypeJSON: "bigint",
-        write: repeated ? "writePackedSint64String" : "writeSint64String",
+        tsType: "number",
+        tsTypeJSON: "number",
+        write: repeated ? "writePackedSint64" : "writeSint64",
       };
     }
     default: {
@@ -1046,8 +1046,7 @@ export function processTypes(
         return;
       }
 
-      const _enum = types.filter((t) => t.type === "enum")[idx]
-        .content as EnumOpts;
+      const _enum = types.filter((t) => t.type === "enum")[idx].content;
 
       // enum comment
       if (path.length === 0) {
@@ -1069,9 +1068,7 @@ export function processTypes(
         return;
       }
 
-      const message = types.filter((t) => t.type === "message")[
-        idx
-      ] as MessageType;
+      const message = types.filter((t) => t.type === "message")[idx];
 
       // message comment
       if (path.length === 0) {
