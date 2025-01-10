@@ -4,8 +4,27 @@ import { assert, fail } from "./goog/asserts.js";
 import {
   WireType,
   FieldTypeToWireType,
-  FieldType,
   INVALID_FIELD_NUMBER,
+  FIELD_TYPE_DOUBLE,
+  FIELD_TYPE_FLOAT,
+  FIELD_TYPE_INT64,
+  FIELD_TYPE_UINT64,
+  FIELD_TYPE_INT32,
+  FIELD_TYPE_FIXED64,
+  FIELD_TYPE_FIXED32,
+  FIELD_TYPE_BOOL,
+  FIELD_TYPE_STRING,
+  FIELD_TYPE_GROUP,
+  FIELD_TYPE_MESSAGE,
+  FIELD_TYPE_BYTES,
+  FIELD_TYPE_UINT32,
+  FIELD_TYPE_ENUM,
+  FIELD_TYPE_SFIXED32,
+  FIELD_TYPE_SFIXED64,
+  FIELD_TYPE_SINT32,
+  FIELD_TYPE_SINT64,
+  FIELD_TYPE_FHASH64,
+  FIELD_TYPE_VHASH64,
 } from "./constants.js";
 import { BinaryDecoder } from "./decoder.js";
 import { ByteSource } from "./utils.js";
@@ -382,53 +401,69 @@ export class BinaryReader {
   /**
    * Reads a field of any valid non-message type from the binary stream.
    */
-  readAny(fieldType: FieldType): number | boolean | string | Uint8Array {
+  readAny(fieldType: number): number | boolean | string | Uint8Array {
     this.nextWireType_ = FieldTypeToWireType(fieldType);
-    switch (fieldType) {
-      case FieldType.DOUBLE:
+    if (fieldType == FIELD_TYPE_DOUBLE){
         return this.readDouble();
-      case FieldType.FLOAT:
+    }
+    else if(fieldType == FIELD_TYPE_FLOAT){
         return this.readFloat();
-      case FieldType.INT64:
+    }
+    else if(fieldType == FIELD_TYPE_INT64){
         return this.readInt64();
-      case FieldType.UINT64:
+    }
+    else if(fieldType == FIELD_TYPE_UINT64){
         return this.readUint64();
-      case FieldType.INT32:
+    }
+    else if(fieldType == FIELD_TYPE_INT32){
         return this.readInt32();
-      case FieldType.FIXED64:
+    }
+    else if(fieldType == FIELD_TYPE_FIXED64){
         return this.readFixed64();
-      case FieldType.FIXED32:
+    }
+    else if(fieldType == FIELD_TYPE_FIXED32){
         return this.readFixed32();
-      case FieldType.BOOL:
+    }
+    else if(fieldType == FIELD_TYPE_BOOL){
         return this.readBool();
-      case FieldType.STRING:
+    }
+    else if(fieldType == FIELD_TYPE_STRING){
         return this.readString();
-      case FieldType.GROUP:
-        fail("Group field type not supported in readAny()");
-        break;
-      case FieldType.MESSAGE:
-        fail("Message field type not supported in readAny()");
-        break;
-      case FieldType.BYTES:
+    }
+    else if(fieldType == FIELD_TYPE_GROUP){
+      fail("Group field type not supported in readAny()");
+    }
+    else if(fieldType == FIELD_TYPE_MESSAGE){
+      fail("Message field type not supported in readAny()");
+    }
+    else if(fieldType == FIELD_TYPE_BYTES){
         return this.readBytes();
-      case FieldType.UINT32:
+    }
+    else if(fieldType == FIELD_TYPE_UINT32){
         return this.readUint32();
-      case FieldType.ENUM:
+    }
+    else if(fieldType == FIELD_TYPE_ENUM){
         return this.readEnum();
-      case FieldType.SFIXED32:
+    }
+    else if(fieldType == FIELD_TYPE_SFIXED32){
         return this.readSfixed32();
-      case FieldType.SFIXED64:
+    }
+    else if(fieldType == FIELD_TYPE_SFIXED64){
         return this.readSfixed64();
-      case FieldType.SINT32:
+    }
+    else if(fieldType == FIELD_TYPE_SINT32){
         return this.readSint32();
-      case FieldType.SINT64:
+    }
+    else if(fieldType == FIELD_TYPE_SINT64){
         return this.readSint64();
-      case FieldType.FHASH64:
+    }
+    else if(fieldType == FIELD_TYPE_FHASH64){
         return this.readFixedHash64();
-      case FieldType.VHASH64:
+    }
+    else if(fieldType == FIELD_TYPE_VHASH64){
         return this.readVarintHash64();
-      default:
-        fail("Invalid field type in readAny()");
+    } else {
+      fail("Invalid field type in readAny()");
     }
     return 0;
   }

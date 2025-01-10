@@ -10,11 +10,30 @@ import { assert, fail } from "./goog/asserts.js";
 import { BinaryEncoder } from "./encoder.js";
 import {
   WireType,
-  FieldType,
   TWO_TO_31,
   TWO_TO_32,
   TWO_TO_63,
   TWO_TO_64,
+  FIELD_TYPE_DOUBLE,
+  FIELD_TYPE_FLOAT,
+  FIELD_TYPE_INT64,
+  FIELD_TYPE_UINT64,
+  FIELD_TYPE_INT32,
+  FIELD_TYPE_FIXED64,
+  FIELD_TYPE_FIXED32,
+  FIELD_TYPE_BOOL,
+  FIELD_TYPE_STRING,
+  FIELD_TYPE_GROUP,
+  FIELD_TYPE_MESSAGE,
+  FIELD_TYPE_BYTES,
+  FIELD_TYPE_UINT32,
+  FIELD_TYPE_ENUM,
+  FIELD_TYPE_SFIXED32,
+  FIELD_TYPE_SFIXED64,
+  FIELD_TYPE_SINT32,
+  FIELD_TYPE_SINT64,
+  FIELD_TYPE_FHASH64,
+  FIELD_TYPE_VHASH64,
 } from "./constants.js";
 import { UInt64, Int64 } from "./arith.js";
 
@@ -164,78 +183,95 @@ export class BinaryWriter {
   /**
    * Writes a field of any valid scalar type to the binary stream.
    */
-  writeAny(fieldType: FieldType, field: number, value: any): void {
-    switch (fieldType) {
-      case FieldType.DOUBLE:
-        this.writeDouble(field, value);
-        return;
-      case FieldType.FLOAT:
-        this.writeFloat(field, value);
-        return;
-      case FieldType.INT64:
-        this.writeInt64(field, value);
-        return;
-      case FieldType.UINT64:
-        this.writeUint64(field, value);
-        return;
-      case FieldType.INT32:
-        this.writeInt32(field, value);
-        return;
-      case FieldType.FIXED64:
-        this.writeFixed64(field, value);
-        return;
-      case FieldType.FIXED32:
-        this.writeFixed32(field, value);
-        return;
-      case FieldType.BOOL:
-        this.writeBool(field, value);
-        return;
-      case FieldType.STRING:
-        this.writeString(field, value);
-        return;
-      case FieldType.GROUP:
-        fail("Group field type not supported in writeAny()");
-        return;
-      case FieldType.MESSAGE:
-        fail("Message field type not supported in writeAny()");
-        return;
-      case FieldType.BYTES:
-        this.writeBytes(field, value);
-        return;
-      case FieldType.UINT32:
-        this.writeUint32(field, value);
-        return;
-      case FieldType.ENUM:
-        this.writeEnum(field, value);
-        return;
-      case FieldType.SFIXED32:
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        this.writeSfixed32(field, value);
-        return;
-      case FieldType.SFIXED64:
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        this.writeSfixed64(field, value);
-        return;
-      case FieldType.SINT32:
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        this.writeSint32(field, value);
-        return;
-      case FieldType.SINT64:
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        this.writeSint64(field, value);
-        return;
-      case FieldType.FHASH64:
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        this.writeFixedHash64(field, value);
-        return;
-      case FieldType.VHASH64:
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        this.writeVarintHash64(field, value);
-        return;
-      default:
-        fail("Invalid field type in writeAny()");
-        return;
+  writeAny(fieldType: number, field: number, value: any): void {
+    if (fieldType==FIELD_TYPE_DOUBLE){
+      this.writeDouble(field, value);
+      return;
     }
+    if (fieldType==FIELD_TYPE_FLOAT){
+      this.writeFloat(field, value);
+      return;
+    }
+    if (fieldType==FIELD_TYPE_INT64){
+      this.writeInt64(field, value);
+      return;
+    }
+    if (fieldType==FIELD_TYPE_UINT64){
+      this.writeUint64(field, value);
+      return;
+    }
+    if (fieldType==FIELD_TYPE_INT32){
+      this.writeInt32(field, value);
+      return;
+    }
+    if (fieldType==FIELD_TYPE_FIXED64){
+      this.writeFixed64(field, value);
+      return;
+    }
+    if (fieldType==FIELD_TYPE_FIXED32){
+      this.writeFixed32(field, value);
+      return;
+    }
+    if (fieldType==FIELD_TYPE_BOOL){
+      this.writeBool(field, value);
+      return;
+    }
+    if (fieldType==FIELD_TYPE_STRING){
+      this.writeString(field, value);
+      return;
+    }
+    if (fieldType==FIELD_TYPE_GROUP){
+      fail("Group field type not supported in writeAny()");
+      return;
+    }
+    if (fieldType==FIELD_TYPE_MESSAGE){
+      fail("Message field type not supported in writeAny()");
+      return;
+    }
+    if (fieldType==FIELD_TYPE_BYTES){
+      this.writeBytes(field, value);
+      return;
+    }
+    if (fieldType==FIELD_TYPE_UINT32){
+      this.writeUint32(field, value);
+      return;
+    }
+    if (fieldType==FIELD_TYPE_ENUM){
+      this.writeEnum(field, value);
+      return;
+    }
+    if (fieldType==FIELD_TYPE_SFIXED32){
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      this.writeSfixed32(field, value);
+      return;
+    }
+    if (fieldType==FIELD_TYPE_SFIXED64){
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      this.writeSfixed64(field, value);
+      return;
+    }
+    if (fieldType==FIELD_TYPE_SINT32){
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      this.writeSint32(field, value);
+      return;
+    }
+    if (fieldType==FIELD_TYPE_SINT64){
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      this.writeSint64(field, value);
+      return;
+    }
+    if (fieldType==FIELD_TYPE_FHASH64){
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      this.writeFixedHash64(field, value);
+      return;
+    }
+    if (fieldType==FIELD_TYPE_VHASH64){
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      this.writeVarintHash64(field, value);
+      return;
+    }
+    fail("Invalid field type in writeAny()");
+    return;
   }
 
   /**
