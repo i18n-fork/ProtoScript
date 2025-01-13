@@ -27,13 +27,13 @@ export const FIELD_TYPE_VHASH64 = 31; // 64-bit hash string, varint encoding.
 /**
  * Wire-format type codes, taken from proto2/public/wire_format_lite.h.
  */
-WIRE_TYPE_INVALID = -1;
-WIRE_TYPE_VARINT = 0;
-WIRE_TYPE_FIXED64 = 1;
-WIRE_TYPE_DELIMITED = 2;
-WIRE_TYPE_START_GROUP = 3;
-WIRE_TYPE_END_GROUP = 4;
-WIRE_TYPE_FIXED32 = 5;
+export const WIRE_TYPE_INVALID = -1;
+export const WIRE_TYPE_VARINT = 0;
+export const WIRE_TYPE_FIXED64 = 1;
+export const WIRE_TYPE_DELIMITED = 2;
+export const WIRE_TYPE_START_GROUP = 3;
+export const WIRE_TYPE_END_GROUP = 4;
+export const WIRE_TYPE_FIXED32 = 5;
 
 // export type WireType = (typeof WireType)[keyof typeof WireType];
 

@@ -9,7 +9,6 @@ import {
 import { assert, fail } from "./goog/asserts.js";
 import { BinaryEncoder } from "./encoder.js";
 import {
-  WIRE_TYPE_INVALID,
   WIRE_TYPE_VARINT,
   WIRE_TYPE_FIXED64,
   WIRE_TYPE_DELIMITED,
