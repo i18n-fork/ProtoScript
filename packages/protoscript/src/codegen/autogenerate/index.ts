@@ -146,9 +146,7 @@ function writeProtobufSerializers(
           // initialize
           result += `\
           /**
-           * Initializes ${
-             ns
-           } with all fields set to their default value.
+           * Initializes ${ns} with all fields set to their default value.
            */
           initialize: function(msg${printIfTypescript(
             `?: Partial<${ns}>`,
@@ -432,7 +430,8 @@ function writeJSONSerializers(types: ProtoTypes[], parents: string[]): string {
   const isTopLevel = parents.length === 0;
 
   types.forEach((node) => {
-    const ns=node.content.namespacedName, nsJSON = node.content.namespacedNameJSON;
+    const ns = node.content.namespacedName,
+      nsJSON = node.content.namespacedNameJSON;
     result += isTopLevel
       ? `export const ${node.content.name}JSON = {`
       : `${node.content.name}: {`;
@@ -457,9 +456,7 @@ function writeJSONSerializers(types: ProtoTypes[], parents: string[]): string {
             result += `encode: function(msg${printIfTypescript(
               `: PartialDeep<${ns}>`,
             )})${printIfTypescript(`: string`)} {
-              return JSON.stringify(${
-                nsJSON
-              }._writeMessage(msg));`;
+              return JSON.stringify(${nsJSON}._writeMessage(msg));`;
           }
           result += "},\n\n";
 
@@ -487,9 +484,7 @@ function writeJSONSerializers(types: ProtoTypes[], parents: string[]): string {
           // initialize
           result += `\
           /**
-           * Initializes ${
-             ns
-           } with all fields set to their default value.
+           * Initializes ${ns} with all fields set to their default value.
            */
           initialize: function(msg${printIfTypescript(
             `?: Partial<${ns}>`,
