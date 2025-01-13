@@ -9,7 +9,13 @@ import {
 import { assert, fail } from "./goog/asserts.js";
 import { BinaryEncoder } from "./encoder.js";
 import {
-  WireType,
+  WIRE_TYPE_INVALID,
+  WIRE_TYPE_VARINT,
+  WIRE_TYPE_FIXED64,
+  WIRE_TYPE_DELIMITED,
+  WIRE_TYPE_START_GROUP,
+  WIRE_TYPE_END_GROUP,
+  WIRE_TYPE_FIXED32,
   TWO_TO_31,
   TWO_TO_32,
   TWO_TO_63,
@@ -82,7 +88,7 @@ export class BinaryWriter {
    * which we will use to patch in the message length to in endDelimited_ below.
    */
   beginDelimited_(field: number): Array<number> {
-    this.writeFieldHeader_(field, WireType.DELIMITED);
+    this.writeFieldHeader_(field, WIRE_TYPE_DELIMITED);
     const bookmark = this.encoder_.end();
     this.blocks_.push(bookmark);
     this.totalLength_ += bookmark.length;
@@ -184,88 +190,88 @@ export class BinaryWriter {
    * Writes a field of any valid scalar type to the binary stream.
    */
   writeAny(fieldType: number, field: number, value: any): void {
-    if (fieldType==FIELD_TYPE_DOUBLE){
+    if (fieldType == FIELD_TYPE_DOUBLE) {
       this.writeDouble(field, value);
       return;
     }
-    if (fieldType==FIELD_TYPE_FLOAT){
+    if (fieldType == FIELD_TYPE_FLOAT) {
       this.writeFloat(field, value);
       return;
     }
-    if (fieldType==FIELD_TYPE_INT64){
+    if (fieldType == FIELD_TYPE_INT64) {
       this.writeInt64(field, value);
       return;
     }
-    if (fieldType==FIELD_TYPE_UINT64){
+    if (fieldType == FIELD_TYPE_UINT64) {
       this.writeUint64(field, value);
       return;
     }
-    if (fieldType==FIELD_TYPE_INT32){
+    if (fieldType == FIELD_TYPE_INT32) {
       this.writeInt32(field, value);
       return;
     }
-    if (fieldType==FIELD_TYPE_FIXED64){
+    if (fieldType == FIELD_TYPE_FIXED64) {
       this.writeFixed64(field, value);
       return;
     }
-    if (fieldType==FIELD_TYPE_FIXED32){
+    if (fieldType == FIELD_TYPE_FIXED32) {
       this.writeFixed32(field, value);
       return;
     }
-    if (fieldType==FIELD_TYPE_BOOL){
+    if (fieldType == FIELD_TYPE_BOOL) {
       this.writeBool(field, value);
       return;
     }
-    if (fieldType==FIELD_TYPE_STRING){
+    if (fieldType == FIELD_TYPE_STRING) {
       this.writeString(field, value);
       return;
     }
-    if (fieldType==FIELD_TYPE_GROUP){
+    if (fieldType == FIELD_TYPE_GROUP) {
       fail("Group field type not supported in writeAny()");
       return;
     }
-    if (fieldType==FIELD_TYPE_MESSAGE){
+    if (fieldType == FIELD_TYPE_MESSAGE) {
       fail("Message field type not supported in writeAny()");
       return;
     }
-    if (fieldType==FIELD_TYPE_BYTES){
+    if (fieldType == FIELD_TYPE_BYTES) {
       this.writeBytes(field, value);
       return;
     }
-    if (fieldType==FIELD_TYPE_UINT32){
+    if (fieldType == FIELD_TYPE_UINT32) {
       this.writeUint32(field, value);
       return;
     }
-    if (fieldType==FIELD_TYPE_ENUM){
+    if (fieldType == FIELD_TYPE_ENUM) {
       this.writeEnum(field, value);
       return;
     }
-    if (fieldType==FIELD_TYPE_SFIXED32){
+    if (fieldType == FIELD_TYPE_SFIXED32) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       this.writeSfixed32(field, value);
       return;
     }
-    if (fieldType==FIELD_TYPE_SFIXED64){
+    if (fieldType == FIELD_TYPE_SFIXED64) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       this.writeSfixed64(field, value);
       return;
     }
-    if (fieldType==FIELD_TYPE_SINT32){
+    if (fieldType == FIELD_TYPE_SINT32) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       this.writeSint32(field, value);
       return;
     }
-    if (fieldType==FIELD_TYPE_SINT64){
+    if (fieldType == FIELD_TYPE_SINT64) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       this.writeSint64(field, value);
       return;
     }
-    if (fieldType==FIELD_TYPE_FHASH64){
+    if (fieldType == FIELD_TYPE_FHASH64) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       this.writeFixedHash64(field, value);
       return;
     }
-    if (fieldType==FIELD_TYPE_VHASH64){
+    if (fieldType == FIELD_TYPE_VHASH64) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       this.writeVarintHash64(field, value);
       return;
@@ -279,7 +285,7 @@ export class BinaryWriter {
    */
   writeUnsignedVarint32_(field: number, value: number | null) {
     if (value == null) return;
-    this.writeFieldHeader_(field, WireType.VARINT);
+    this.writeFieldHeader_(field, WIRE_TYPE_VARINT);
     this.encoder_.writeUnsignedVarint32(value);
   }
 
@@ -288,7 +294,7 @@ export class BinaryWriter {
    */
   writeSignedVarint32_(field: number, value: number | null) {
     if (value == null) return;
-    this.writeFieldHeader_(field, WireType.VARINT);
+    this.writeFieldHeader_(field, WIRE_TYPE_VARINT);
     this.encoder_.writeSignedVarint32(value);
   }
 
@@ -297,7 +303,7 @@ export class BinaryWriter {
    */
   writeUnsignedVarint64_(field: number, value: number | null) {
     if (value == null) return;
-    this.writeFieldHeader_(field, WireType.VARINT);
+    this.writeFieldHeader_(field, WIRE_TYPE_VARINT);
     this.encoder_.writeUnsignedVarint64(value);
   }
 
@@ -306,7 +312,7 @@ export class BinaryWriter {
    */
   writeSignedVarint64_(field: number, value: number | null) {
     if (value == null) return;
-    this.writeFieldHeader_(field, WireType.VARINT);
+    this.writeFieldHeader_(field, WIRE_TYPE_VARINT);
     this.encoder_.writeSignedVarint64(value);
   }
 
@@ -315,7 +321,7 @@ export class BinaryWriter {
    */
   writeZigzagVarint32_(field: number, value: number | null) {
     if (value == null) return;
-    this.writeFieldHeader_(field, WireType.VARINT);
+    this.writeFieldHeader_(field, WIRE_TYPE_VARINT);
     this.encoder_.writeZigzagVarint32(value);
   }
 
@@ -324,7 +330,7 @@ export class BinaryWriter {
    */
   writeZigzagVarint64_(field: number, value: number | null) {
     if (value == null) return;
-    this.writeFieldHeader_(field, WireType.VARINT);
+    this.writeFieldHeader_(field, WIRE_TYPE_VARINT);
     this.encoder_.writeZigzagVarint64(value);
   }
 
@@ -333,7 +339,7 @@ export class BinaryWriter {
    */
   writeZigzagVarint64String_(field: number, value: string | null) {
     if (value == null) return;
-    this.writeFieldHeader_(field, WireType.VARINT);
+    this.writeFieldHeader_(field, WIRE_TYPE_VARINT);
     this.encoder_.writeZigzagVarint64String(value);
   }
 
@@ -342,7 +348,7 @@ export class BinaryWriter {
    */
   writeZigzagVarintHash64_(field: number, value: string | null) {
     if (value == null) return;
-    this.writeFieldHeader_(field, WireType.VARINT);
+    this.writeFieldHeader_(field, WIRE_TYPE_VARINT);
     this.encoder_.writeZigzagVarintHash64(value);
   }
 
@@ -383,7 +389,7 @@ export class BinaryWriter {
   writeInt64String(field: number, value: string | null) {
     if (value == null) return;
     const num = Int64.fromString(value);
-    this.writeFieldHeader_(field, WireType.VARINT);
+    this.writeFieldHeader_(field, WIRE_TYPE_VARINT);
     this.encoder_.writeSplitVarint64(num.lo, num.hi);
   }
 
@@ -424,7 +430,7 @@ export class BinaryWriter {
   writeUint64String(field: number, value: string | null) {
     if (value == null) return;
     const num = UInt64.fromString(value);
-    this.writeFieldHeader_(field, WireType.VARINT);
+    this.writeFieldHeader_(field, WIRE_TYPE_VARINT);
     this.encoder_.writeSplitVarint64(num.lo, num.hi);
   }
 
@@ -473,7 +479,7 @@ export class BinaryWriter {
   writeFixed32(field: number, value: number | null) {
     if (value == null) return;
     assert(value >= 0 && value < TWO_TO_32);
-    this.writeFieldHeader_(field, WireType.FIXED32);
+    this.writeFieldHeader_(field, WIRE_TYPE_FIXED32);
     this.encoder_.writeUint32(value);
   }
 
@@ -484,7 +490,7 @@ export class BinaryWriter {
   writeFixed64(field: number, value: number | null) {
     if (value == null) return;
     assert(value >= 0 && value < TWO_TO_64);
-    this.writeFieldHeader_(field, WireType.FIXED64);
+    this.writeFieldHeader_(field, WIRE_TYPE_FIXED64);
     this.encoder_.writeUint64(value);
   }
 
@@ -494,7 +500,7 @@ export class BinaryWriter {
   writeFixed64String(field: number, value: string | null) {
     if (value == null) return;
     const num = UInt64.fromString(value);
-    this.writeFieldHeader_(field, WireType.FIXED64);
+    this.writeFieldHeader_(field, WIRE_TYPE_FIXED64);
     this.encoder_.writeSplitFixed64(num.lo, num.hi);
   }
 
@@ -505,7 +511,7 @@ export class BinaryWriter {
   writeSfixed32(field: number, value: number | null) {
     if (value == null) return;
     assert(value >= -TWO_TO_31 && value < TWO_TO_31);
-    this.writeFieldHeader_(field, WireType.FIXED32);
+    this.writeFieldHeader_(field, WIRE_TYPE_FIXED32);
     this.encoder_.writeInt32(value);
   }
 
@@ -516,7 +522,7 @@ export class BinaryWriter {
   writeSfixed64(field: number, value: number | null) {
     if (value == null) return;
     assert(value >= -TWO_TO_63 && value < TWO_TO_63);
-    this.writeFieldHeader_(field, WireType.FIXED64);
+    this.writeFieldHeader_(field, WIRE_TYPE_FIXED64);
     this.encoder_.writeInt64(value);
   }
 
@@ -527,7 +533,7 @@ export class BinaryWriter {
   writeSfixed64String(field: number, value: string | null) {
     if (value == null) return;
     const num = Int64.fromString(value);
-    this.writeFieldHeader_(field, WireType.FIXED64);
+    this.writeFieldHeader_(field, WIRE_TYPE_FIXED64);
     this.encoder_.writeSplitFixed64(num.lo, num.hi);
   }
 
@@ -537,7 +543,7 @@ export class BinaryWriter {
    */
   writeFloat(field: number, value: number | null) {
     if (value == null) return;
-    this.writeFieldHeader_(field, WireType.FIXED32);
+    this.writeFieldHeader_(field, WIRE_TYPE_FIXED32);
     this.encoder_.writeFloat(value);
   }
 
@@ -547,7 +553,7 @@ export class BinaryWriter {
    */
   writeDouble(field: number, value: number | null) {
     if (value == null) return;
-    this.writeFieldHeader_(field, WireType.FIXED64);
+    this.writeFieldHeader_(field, WIRE_TYPE_FIXED64);
     this.encoder_.writeDouble(value);
   }
 
@@ -559,7 +565,7 @@ export class BinaryWriter {
   writeBool(field: number, value: boolean | number | undefined) {
     if (value == null) return;
     assert(typeof value === "boolean" || typeof value === "number");
-    this.writeFieldHeader_(field, WireType.VARINT);
+    this.writeFieldHeader_(field, WIRE_TYPE_VARINT);
     this.encoder_.writeBool(value);
   }
 
@@ -569,7 +575,7 @@ export class BinaryWriter {
   writeEnum(field: number, value: number | null) {
     if (value == null) return;
     assert(value >= -TWO_TO_31 && value < TWO_TO_31);
-    this.writeFieldHeader_(field, WireType.VARINT);
+    this.writeFieldHeader_(field, WIRE_TYPE_VARINT);
     this.encoder_.writeSignedVarint32(value);
   }
 
@@ -590,7 +596,7 @@ export class BinaryWriter {
   writeBytes(field: number, value: ByteSource | null) {
     if (value == null) return;
     const bytes = byteSourceToUint8Array(value);
-    this.writeFieldHeader_(field, WireType.DELIMITED);
+    this.writeFieldHeader_(field, WIRE_TYPE_DELIMITED);
     this.encoder_.writeUnsignedVarint32(bytes.length);
     this.appendUint8Array_(bytes);
   }
@@ -620,13 +626,13 @@ export class BinaryWriter {
     if (value == null) return;
     // The wire format for a message set is defined by
     // google3/net/proto/message_set.proto
-    this.writeFieldHeader_(1, WireType.START_GROUP);
-    this.writeFieldHeader_(2, WireType.VARINT);
+    this.writeFieldHeader_(1, WIRE_TYPE_START_GROUP);
+    this.writeFieldHeader_(2, WIRE_TYPE_VARINT);
     this.encoder_.writeSignedVarint32(field);
     const bookmark = this.beginDelimited_(3);
     writerCallback(value, this);
     this.endDelimited_(bookmark);
-    this.writeFieldHeader_(1, WireType.END_GROUP);
+    this.writeFieldHeader_(1, WIRE_TYPE_END_GROUP);
   }
 
   /**
@@ -638,9 +644,9 @@ export class BinaryWriter {
     writerCallback: (arg0: MessageType, arg1: BinaryWriter) => void,
   ) {
     if (value == null) return;
-    this.writeFieldHeader_(field, WireType.START_GROUP);
+    this.writeFieldHeader_(field, WIRE_TYPE_START_GROUP);
     writerCallback(value, this);
-    this.writeFieldHeader_(field, WireType.END_GROUP);
+    this.writeFieldHeader_(field, WIRE_TYPE_END_GROUP);
   }
 
   /**
@@ -650,7 +656,7 @@ export class BinaryWriter {
   writeFixedHash64(field: number, value: string | null) {
     if (value == null) return;
     assert(value.length == 8);
-    this.writeFieldHeader_(field, WireType.FIXED64);
+    this.writeFieldHeader_(field, WIRE_TYPE_FIXED64);
     this.encoder_.writeFixedHash64(value);
   }
 
@@ -661,7 +667,7 @@ export class BinaryWriter {
   writeVarintHash64(field: number, value: string | null) {
     if (value == null) return;
     assert(value.length == 8);
-    this.writeFieldHeader_(field, WireType.VARINT);
+    this.writeFieldHeader_(field, WIRE_TYPE_VARINT);
     this.encoder_.writeVarintHash64(value);
   }
 
@@ -669,7 +675,7 @@ export class BinaryWriter {
    * Writes a 64-bit field to the buffer as a fixed64.
    */
   writeSplitFixed64(field: number, lowBits: number, highBits: number) {
-    this.writeFieldHeader_(field, WireType.FIXED64);
+    this.writeFieldHeader_(field, WIRE_TYPE_FIXED64);
     this.encoder_.writeSplitFixed64(lowBits, highBits);
   }
 
@@ -677,7 +683,7 @@ export class BinaryWriter {
    * Writes a 64-bit field to the buffer as a varint.
    */
   writeSplitVarint64(field: number, lowBits: number, highBits: number) {
-    this.writeFieldHeader_(field, WireType.VARINT);
+    this.writeFieldHeader_(field, WIRE_TYPE_VARINT);
     this.encoder_.writeSplitVarint64(lowBits, highBits);
   }
 
@@ -685,7 +691,7 @@ export class BinaryWriter {
    * Writes a 64-bit field to the buffer as a zigzag encoded varint.
    */
   writeSplitZigzagVarint64(field: number, lowBits: number, highBits: number) {
-    this.writeFieldHeader_(field, WireType.VARINT);
+    this.writeFieldHeader_(field, WIRE_TYPE_VARINT);
     const encoder = this.encoder_;
     toZigzag64(lowBits, highBits, function (lowBits, highBits) {
       encoder.writeSplitVarint64(lowBits >>> 0, highBits >>> 0);
@@ -1015,9 +1021,9 @@ export class BinaryWriter {
   ) {
     if (value == null) return;
     for (let i = 0; i < value.length; i++) {
-      this.writeFieldHeader_(field, WireType.START_GROUP);
+      this.writeFieldHeader_(field, WIRE_TYPE_START_GROUP);
       writerCallback(value[i], this);
-      this.writeFieldHeader_(field, WireType.END_GROUP);
+      this.writeFieldHeader_(field, WIRE_TYPE_END_GROUP);
     }
   }
 
@@ -1254,7 +1260,7 @@ export class BinaryWriter {
    */
   writePackedFixed32(field: number, value: Array<number> | null) {
     if (!value?.length) return;
-    this.writeFieldHeader_(field, WireType.DELIMITED);
+    this.writeFieldHeader_(field, WIRE_TYPE_DELIMITED);
     this.encoder_.writeUnsignedVarint32(value.length * 4);
     for (let i = 0; i < value.length; i++) {
       this.encoder_.writeUint32(value[i]);
@@ -1266,7 +1272,7 @@ export class BinaryWriter {
    */
   writePackedFixed64(field: number, value: Array<number> | null) {
     if (!value?.length) return;
-    this.writeFieldHeader_(field, WireType.DELIMITED);
+    this.writeFieldHeader_(field, WIRE_TYPE_DELIMITED);
     this.encoder_.writeUnsignedVarint32(value.length * 8);
     for (let i = 0; i < value.length; i++) {
       this.encoder_.writeUint64(value[i]);
@@ -1279,7 +1285,7 @@ export class BinaryWriter {
    */
   writePackedFixed64String(field: number, value: Array<string> | null) {
     if (!value?.length) return;
-    this.writeFieldHeader_(field, WireType.DELIMITED);
+    this.writeFieldHeader_(field, WIRE_TYPE_DELIMITED);
     this.encoder_.writeUnsignedVarint32(value.length * 8);
     for (let i = 0; i < value.length; i++) {
       const num = UInt64.fromString(value[i]);
@@ -1292,7 +1298,7 @@ export class BinaryWriter {
    */
   writePackedSfixed32(field: number, value: Array<number> | null) {
     if (!value?.length) return;
-    this.writeFieldHeader_(field, WireType.DELIMITED);
+    this.writeFieldHeader_(field, WIRE_TYPE_DELIMITED);
     this.encoder_.writeUnsignedVarint32(value.length * 4);
     for (let i = 0; i < value.length; i++) {
       this.encoder_.writeInt32(value[i]);
@@ -1304,7 +1310,7 @@ export class BinaryWriter {
    */
   writePackedSfixed64(field: number, value: Array<number> | null) {
     if (!value?.length) return;
-    this.writeFieldHeader_(field, WireType.DELIMITED);
+    this.writeFieldHeader_(field, WIRE_TYPE_DELIMITED);
     this.encoder_.writeUnsignedVarint32(value.length * 8);
     for (let i = 0; i < value.length; i++) {
       this.encoder_.writeInt64(value[i]);
@@ -1316,7 +1322,7 @@ export class BinaryWriter {
    */
   writePackedSfixed64String(field: number, value: Array<string> | null) {
     if (!value?.length) return;
-    this.writeFieldHeader_(field, WireType.DELIMITED);
+    this.writeFieldHeader_(field, WIRE_TYPE_DELIMITED);
     this.encoder_.writeUnsignedVarint32(value.length * 8);
     for (let i = 0; i < value.length; i++) {
       this.encoder_.writeInt64String(value[i]);
@@ -1328,7 +1334,7 @@ export class BinaryWriter {
    */
   writePackedFloat(field: number, value: Array<number> | null) {
     if (!value?.length) return;
-    this.writeFieldHeader_(field, WireType.DELIMITED);
+    this.writeFieldHeader_(field, WIRE_TYPE_DELIMITED);
     this.encoder_.writeUnsignedVarint32(value.length * 4);
     for (let i = 0; i < value.length; i++) {
       this.encoder_.writeFloat(value[i]);
@@ -1340,7 +1346,7 @@ export class BinaryWriter {
    */
   writePackedDouble(field: number, value: Array<number> | null) {
     if (!value?.length) return;
-    this.writeFieldHeader_(field, WireType.DELIMITED);
+    this.writeFieldHeader_(field, WIRE_TYPE_DELIMITED);
     this.encoder_.writeUnsignedVarint32(value.length * 8);
     for (let i = 0; i < value.length; i++) {
       this.encoder_.writeDouble(value[i]);
@@ -1352,7 +1358,7 @@ export class BinaryWriter {
    */
   writePackedBool(field: number, value: Array<boolean> | null) {
     if (!value?.length) return;
-    this.writeFieldHeader_(field, WireType.DELIMITED);
+    this.writeFieldHeader_(field, WIRE_TYPE_DELIMITED);
     this.encoder_.writeUnsignedVarint32(value.length);
     for (let i = 0; i < value.length; i++) {
       this.encoder_.writeBool(value[i]);
@@ -1377,7 +1383,7 @@ export class BinaryWriter {
    */
   writePackedFixedHash64(field: number, value: Array<string> | null) {
     if (!value?.length) return;
-    this.writeFieldHeader_(field, WireType.DELIMITED);
+    this.writeFieldHeader_(field, WIRE_TYPE_DELIMITED);
     this.encoder_.writeUnsignedVarint32(value.length * 8);
     for (let i = 0; i < value.length; i++) {
       this.encoder_.writeFixedHash64(value[i]);

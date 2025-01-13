@@ -27,22 +27,20 @@ export const FIELD_TYPE_VHASH64 = 31; // 64-bit hash string, varint encoding.
 /**
  * Wire-format type codes, taken from proto2/public/wire_format_lite.h.
  */
-export const WireType = {
-  INVALID: -1,
-  VARINT: 0,
-  FIXED64: 1,
-  DELIMITED: 2,
-  START_GROUP: 3,
-  END_GROUP: 4,
-  FIXED32: 5,
-};
+WIRE_TYPE_INVALID = -1;
+WIRE_TYPE_VARINT = 0;
+WIRE_TYPE_FIXED64 = 1;
+WIRE_TYPE_DELIMITED = 2;
+WIRE_TYPE_START_GROUP = 3;
+WIRE_TYPE_END_GROUP = 4;
+WIRE_TYPE_FIXED32 = 5;
 
-export type WireType = (typeof WireType)[keyof typeof WireType];
+// export type WireType = (typeof WireType)[keyof typeof WireType];
 
 /**
  * Translates field type to wire type.
  */
-export const FieldTypeToWireType = function (fieldType: number): WireType {
+export const FieldTypeToWireType = function (fieldType: number): number {
   switch (fieldType) {
     case FIELD_TYPE_INT32:
     case FIELD_TYPE_INT64:
@@ -53,24 +51,24 @@ export const FieldTypeToWireType = function (fieldType: number): WireType {
     case FIELD_TYPE_BOOL:
     case FIELD_TYPE_ENUM:
     case FIELD_TYPE_VHASH64:
-      return WireType.VARINT;
+      return WIRE_TYPE_VARINT;
     case FIELD_TYPE_DOUBLE:
     case FIELD_TYPE_FIXED64:
     case FIELD_TYPE_SFIXED64:
     case FIELD_TYPE_FHASH64:
-      return WireType.FIXED64;
+      return WIRE_TYPE_FIXED64;
     case FIELD_TYPE_STRING:
     case FIELD_TYPE_MESSAGE:
     case FIELD_TYPE_BYTES:
-      return WireType.DELIMITED;
+      return WIRE_TYPE_DELIMITED;
     case FIELD_TYPE_FLOAT:
     case FIELD_TYPE_FIXED32:
     case FIELD_TYPE_SFIXED32:
-      return WireType.FIXED32;
+      return WIRE_TYPE_FIXED32;
     case FIELD_TYPE_INVALID:
     case FIELD_TYPE_GROUP:
     default:
-      return WireType.INVALID;
+      return WIRE_TYPE_INVALID;
   }
 };
 

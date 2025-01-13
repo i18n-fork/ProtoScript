@@ -2,7 +2,13 @@
 
 import { assert, fail } from "./goog/asserts.js";
 import {
-  WireType,
+  WIRE_TYPE_INVALID,
+  WIRE_TYPE_VARINT,
+  WIRE_TYPE_FIXED64,
+  WIRE_TYPE_DELIMITED,
+  WIRE_TYPE_START_GROUP,
+  WIRE_TYPE_END_GROUP,
+  WIRE_TYPE_FIXED32,
   FieldTypeToWireType,
   INVALID_FIELD_NUMBER,
   FIELD_TYPE_DOUBLE,
@@ -62,7 +68,7 @@ export class BinaryReader {
   decoder_: BinaryDecoder;
   fieldCursor_: number;
   nextField_: number;
-  nextWireType_: WireType;
+  nextWireType_: number;
   error_: boolean;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   readCallbacks_: Record<string, (reader: BinaryReader) => any>;
@@ -91,7 +97,7 @@ export class BinaryReader {
      * Wire type of the next proto field in the buffer, filled in by
      * nextField().
      */
-    this.nextWireType_ = WireType.INVALID;
+    this.nextWireType_ = WIRE_TYPE_INVALID;
 
     /**
      * Set to true if this reader encountered an error due to corrupt data.
@@ -110,7 +116,7 @@ export class BinaryReader {
   free() {
     this.decoder_.clear();
     this.nextField_ = INVALID_FIELD_NUMBER;
-    this.nextWireType_ = WireType.INVALID;
+    this.nextWireType_ = WIRE_TYPE_INVALID;
     this.error_ = false;
     this.readCallbacks_ = {};
 
@@ -145,9 +151,9 @@ export class BinaryReader {
   }
 
   /**
-   * The wire type of the next field in the stream, or WireType.INVALID if there is no next field.
+   * The wire type of the next field in the stream, or WIRE_TYPE_INVALID if there is no next field.
    */
-  getWireType(): WireType {
+  getWireType(): number {
     return this.nextWireType_;
   }
 
@@ -156,7 +162,7 @@ export class BinaryReader {
    * conditionally parse packed repeated fields.
    */
   isDelimited(): boolean {
-    return this.nextWireType_ == WireType.DELIMITED;
+    return this.nextWireType_ == WIRE_TYPE_DELIMITED;
   }
 
   /**
@@ -164,7 +170,7 @@ export class BinaryReader {
    * an exit condition in decoder loops in generated code.
    */
   isEndGroup(): boolean {
-    return this.nextWireType_ == WireType.END_GROUP;
+    return this.nextWireType_ == WIRE_TYPE_END_GROUP;
   }
 
   /**
@@ -180,7 +186,7 @@ export class BinaryReader {
   setBlock(bytes: Uint8Array, start: number, length: number) {
     this.decoder_.setBlock(bytes, start, length);
     this.nextField_ = INVALID_FIELD_NUMBER;
-    this.nextWireType_ = WireType.INVALID;
+    this.nextWireType_ = WIRE_TYPE_INVALID;
   }
 
   /**
@@ -190,7 +196,7 @@ export class BinaryReader {
   reset() {
     this.decoder_.reset();
     this.nextField_ = INVALID_FIELD_NUMBER;
-    this.nextWireType_ = WireType.INVALID;
+    this.nextWireType_ = WIRE_TYPE_INVALID;
   }
 
   /**
@@ -229,12 +235,12 @@ export class BinaryReader {
 
     // If the wire type isn't one of the valid ones, something's broken.
     if (
-      nextWireType != WireType.VARINT &&
-      nextWireType != WireType.FIXED32 &&
-      nextWireType != WireType.FIXED64 &&
-      nextWireType != WireType.DELIMITED &&
-      nextWireType != WireType.START_GROUP &&
-      nextWireType != WireType.END_GROUP
+      nextWireType != WIRE_TYPE_VARINT &&
+      nextWireType != WIRE_TYPE_FIXED32 &&
+      nextWireType != WIRE_TYPE_FIXED64 &&
+      nextWireType != WIRE_TYPE_DELIMITED &&
+      nextWireType != WIRE_TYPE_START_GROUP &&
+      nextWireType != WIRE_TYPE_END_GROUP
     ) {
       fail(
         `Invalid wire type: ${nextWireType} (at position ${this.fieldCursor_})`,
@@ -276,7 +282,7 @@ export class BinaryReader {
    * Skips over the next varint field in the binary stream.
    */
   skipVarintField() {
-    if (this.nextWireType_ != WireType.VARINT) {
+    if (this.nextWireType_ != WIRE_TYPE_VARINT) {
       fail("Invalid wire type for skipVarintField");
       this.skipField();
       return;
@@ -289,7 +295,7 @@ export class BinaryReader {
    * Skips over the next delimited field in the binary stream.
    */
   skipDelimitedField() {
-    if (this.nextWireType_ != WireType.DELIMITED) {
+    if (this.nextWireType_ != WIRE_TYPE_DELIMITED) {
       fail("Invalid wire type for skipDelimitedField");
       this.skipField();
       return;
@@ -303,7 +309,7 @@ export class BinaryReader {
    * Skips over the next fixed32 field in the binary stream.
    */
   skipFixed32Field() {
-    if (this.nextWireType_ != WireType.FIXED32) {
+    if (this.nextWireType_ != WIRE_TYPE_FIXED32) {
       fail("Invalid wire type for skipFixed32Field");
       this.skipField();
       return;
@@ -316,7 +322,7 @@ export class BinaryReader {
    * Skips over the next fixed64 field in the binary stream.
    */
   skipFixed64Field() {
-    if (this.nextWireType_ != WireType.FIXED64) {
+    if (this.nextWireType_ != WIRE_TYPE_FIXED64) {
       fail("Invalid wire type for skipFixed64Field");
       this.skipField();
       return;
@@ -337,7 +343,7 @@ export class BinaryReader {
         this.error_ = true;
         return;
       }
-      if (this.nextWireType_ == WireType.END_GROUP) {
+      if (this.nextWireType_ == WIRE_TYPE_END_GROUP) {
         // Group end: check that it matches top-of-stack.
         if (this.nextField_ != previousField) {
           fail("Unmatched end-group tag");
@@ -356,19 +362,19 @@ export class BinaryReader {
    */
   skipField() {
     switch (this.nextWireType_) {
-      case WireType.VARINT:
+      case WIRE_TYPE_VARINT:
         this.skipVarintField();
         break;
-      case WireType.FIXED64:
+      case WIRE_TYPE_FIXED64:
         this.skipFixed64Field();
         break;
-      case WireType.DELIMITED:
+      case WIRE_TYPE_DELIMITED:
         this.skipDelimitedField();
         break;
-      case WireType.FIXED32:
+      case WIRE_TYPE_FIXED32:
         this.skipFixed32Field();
         break;
-      case WireType.START_GROUP:
+      case WIRE_TYPE_START_GROUP:
         this.skipGroup();
         break;
       default:
@@ -403,65 +409,46 @@ export class BinaryReader {
    */
   readAny(fieldType: number): number | boolean | string | Uint8Array {
     this.nextWireType_ = FieldTypeToWireType(fieldType);
-    if (fieldType == FIELD_TYPE_DOUBLE){
-        return this.readDouble();
-    }
-    else if(fieldType == FIELD_TYPE_FLOAT){
-        return this.readFloat();
-    }
-    else if(fieldType == FIELD_TYPE_INT64){
-        return this.readInt64();
-    }
-    else if(fieldType == FIELD_TYPE_UINT64){
-        return this.readUint64();
-    }
-    else if(fieldType == FIELD_TYPE_INT32){
-        return this.readInt32();
-    }
-    else if(fieldType == FIELD_TYPE_FIXED64){
-        return this.readFixed64();
-    }
-    else if(fieldType == FIELD_TYPE_FIXED32){
-        return this.readFixed32();
-    }
-    else if(fieldType == FIELD_TYPE_BOOL){
-        return this.readBool();
-    }
-    else if(fieldType == FIELD_TYPE_STRING){
-        return this.readString();
-    }
-    else if(fieldType == FIELD_TYPE_GROUP){
+    if (fieldType == FIELD_TYPE_DOUBLE) {
+      return this.readDouble();
+    } else if (fieldType == FIELD_TYPE_FLOAT) {
+      return this.readFloat();
+    } else if (fieldType == FIELD_TYPE_INT64) {
+      return this.readInt64();
+    } else if (fieldType == FIELD_TYPE_UINT64) {
+      return this.readUint64();
+    } else if (fieldType == FIELD_TYPE_INT32) {
+      return this.readInt32();
+    } else if (fieldType == FIELD_TYPE_FIXED64) {
+      return this.readFixed64();
+    } else if (fieldType == FIELD_TYPE_FIXED32) {
+      return this.readFixed32();
+    } else if (fieldType == FIELD_TYPE_BOOL) {
+      return this.readBool();
+    } else if (fieldType == FIELD_TYPE_STRING) {
+      return this.readString();
+    } else if (fieldType == FIELD_TYPE_GROUP) {
       fail("Group field type not supported in readAny()");
-    }
-    else if(fieldType == FIELD_TYPE_MESSAGE){
+    } else if (fieldType == FIELD_TYPE_MESSAGE) {
       fail("Message field type not supported in readAny()");
-    }
-    else if(fieldType == FIELD_TYPE_BYTES){
-        return this.readBytes();
-    }
-    else if(fieldType == FIELD_TYPE_UINT32){
-        return this.readUint32();
-    }
-    else if(fieldType == FIELD_TYPE_ENUM){
-        return this.readEnum();
-    }
-    else if(fieldType == FIELD_TYPE_SFIXED32){
-        return this.readSfixed32();
-    }
-    else if(fieldType == FIELD_TYPE_SFIXED64){
-        return this.readSfixed64();
-    }
-    else if(fieldType == FIELD_TYPE_SINT32){
-        return this.readSint32();
-    }
-    else if(fieldType == FIELD_TYPE_SINT64){
-        return this.readSint64();
-    }
-    else if(fieldType == FIELD_TYPE_FHASH64){
-        return this.readFixedHash64();
-    }
-    else if(fieldType == FIELD_TYPE_VHASH64){
-        return this.readVarintHash64();
+    } else if (fieldType == FIELD_TYPE_BYTES) {
+      return this.readBytes();
+    } else if (fieldType == FIELD_TYPE_UINT32) {
+      return this.readUint32();
+    } else if (fieldType == FIELD_TYPE_ENUM) {
+      return this.readEnum();
+    } else if (fieldType == FIELD_TYPE_SFIXED32) {
+      return this.readSfixed32();
+    } else if (fieldType == FIELD_TYPE_SFIXED64) {
+      return this.readSfixed64();
+    } else if (fieldType == FIELD_TYPE_SINT32) {
+      return this.readSint32();
+    } else if (fieldType == FIELD_TYPE_SINT64) {
+      return this.readSint64();
+    } else if (fieldType == FIELD_TYPE_FHASH64) {
+      return this.readFixedHash64();
+    } else if (fieldType == FIELD_TYPE_VHASH64) {
+      return this.readVarintHash64();
     } else {
       fail("Invalid field type in readAny()");
     }
@@ -475,7 +462,7 @@ export class BinaryReader {
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   readMessage<T>(message: T, reader: (arg0: T, arg1: BinaryReader) => any) {
-    assert(this.nextWireType_ == WireType.DELIMITED);
+    assert(this.nextWireType_ == WIRE_TYPE_DELIMITED);
 
     // Save the current endpoint of the decoder and move it to the end of the
     // embedded message.
@@ -503,14 +490,14 @@ export class BinaryReader {
     reader: (arg0: T, arg1: BinaryReader) => T,
   ) {
     // Ensure that the wire type is correct.
-    assert(this.nextWireType_ == WireType.START_GROUP);
+    assert(this.nextWireType_ == WIRE_TYPE_START_GROUP);
     // Ensure that the field number is correct.
     assert(this.nextField_ == field);
 
     // Deserialize the message. The deserialization will stop at an END_GROUP tag.
     reader(message, this);
 
-    if (!this.error_ && this.nextWireType_ != WireType.END_GROUP) {
+    if (!this.error_ && this.nextWireType_ != WIRE_TYPE_END_GROUP) {
       fail("Group submessage did not end with an END_GROUP tag");
       this.error_ = true;
     }
@@ -520,7 +507,7 @@ export class BinaryReader {
    * Return a decoder that wraps the current delimited field.
    */
   getFieldDecoder(): BinaryDecoder {
-    assert(this.nextWireType_ == WireType.DELIMITED);
+    assert(this.nextWireType_ == WIRE_TYPE_DELIMITED);
 
     const length = this.decoder_.readUnsignedVarint32();
     const start = this.decoder_.getCursor();
@@ -540,7 +527,7 @@ export class BinaryReader {
    * error if the next field in the stream is not of the correct wire type.
    */
   readInt32(): number {
-    assert(this.nextWireType_ == WireType.VARINT);
+    assert(this.nextWireType_ == WIRE_TYPE_VARINT);
     return this.decoder_.readSignedVarint32();
   }
 
@@ -549,7 +536,7 @@ export class BinaryReader {
    * error if the next field in the stream is not of the correct wire type.
    */
   readInt32String(): string {
-    assert(this.nextWireType_ == WireType.VARINT);
+    assert(this.nextWireType_ == WIRE_TYPE_VARINT);
     return this.decoder_.readSignedVarint32String();
   }
 
@@ -558,7 +545,7 @@ export class BinaryReader {
    * error if the next field in the stream is not of the correct wire type.
    */
   readInt64(): number {
-    assert(this.nextWireType_ == WireType.VARINT);
+    assert(this.nextWireType_ == WIRE_TYPE_VARINT);
     return this.decoder_.readSignedVarint64();
   }
 
@@ -569,7 +556,7 @@ export class BinaryReader {
    * Returns the value as a string.
    */
   readInt64String(): string {
-    assert(this.nextWireType_ == WireType.VARINT);
+    assert(this.nextWireType_ == WIRE_TYPE_VARINT);
     return this.decoder_.readSignedVarint64String();
   }
 
@@ -578,7 +565,7 @@ export class BinaryReader {
    * error if the next field in the stream is not of the correct wire type.
    */
   readUint32(): number {
-    assert(this.nextWireType_ == WireType.VARINT);
+    assert(this.nextWireType_ == WIRE_TYPE_VARINT);
     return this.decoder_.readUnsignedVarint32();
   }
 
@@ -589,7 +576,7 @@ export class BinaryReader {
    * Returns the value as a string.
    */
   readUint32String(): string {
-    assert(this.nextWireType_ == WireType.VARINT);
+    assert(this.nextWireType_ == WIRE_TYPE_VARINT);
     return this.decoder_.readUnsignedVarint32String();
   }
 
@@ -598,7 +585,7 @@ export class BinaryReader {
    * error if the next field in the stream is not of the correct wire type.
    */
   readUint64(): number {
-    assert(this.nextWireType_ == WireType.VARINT);
+    assert(this.nextWireType_ == WIRE_TYPE_VARINT);
     return this.decoder_.readUnsignedVarint64();
   }
 
@@ -609,7 +596,7 @@ export class BinaryReader {
    * Returns the value as a string.
    */
   readUint64String(): string {
-    assert(this.nextWireType_ == WireType.VARINT);
+    assert(this.nextWireType_ == WIRE_TYPE_VARINT);
     return this.decoder_.readUnsignedVarint64String();
   }
 
@@ -619,7 +606,7 @@ export class BinaryReader {
    * wire type.
    */
   readSint32(): number {
-    assert(this.nextWireType_ == WireType.VARINT);
+    assert(this.nextWireType_ == WIRE_TYPE_VARINT);
     return this.decoder_.readZigzagVarint32();
   }
 
@@ -629,7 +616,7 @@ export class BinaryReader {
    * wire type.
    */
   readSint64(): number {
-    assert(this.nextWireType_ == WireType.VARINT);
+    assert(this.nextWireType_ == WIRE_TYPE_VARINT);
     return this.decoder_.readZigzagVarint64();
   }
 
@@ -639,7 +626,7 @@ export class BinaryReader {
    * wire type.
    */
   readSint64String(): string {
-    assert(this.nextWireType_ == WireType.VARINT);
+    assert(this.nextWireType_ == WIRE_TYPE_VARINT);
     return this.decoder_.readZigzagVarint64String();
   }
 
@@ -649,7 +636,7 @@ export class BinaryReader {
    * wire type.
    */
   readFixed32(): number {
-    assert(this.nextWireType_ == WireType.FIXED32);
+    assert(this.nextWireType_ == WIRE_TYPE_FIXED32);
     return this.decoder_.readUint32();
   }
 
@@ -659,7 +646,7 @@ export class BinaryReader {
    * wire type.
    */
   readFixed64(): number {
-    assert(this.nextWireType_ == WireType.FIXED64);
+    assert(this.nextWireType_ == WIRE_TYPE_FIXED64);
     return this.decoder_.readUint64();
   }
 
@@ -671,7 +658,7 @@ export class BinaryReader {
    * Returns the value as a string.
    */
   readFixed64String(): string {
-    assert(this.nextWireType_ == WireType.FIXED64);
+    assert(this.nextWireType_ == WIRE_TYPE_FIXED64);
     return this.decoder_.readUint64String();
   }
 
@@ -681,7 +668,7 @@ export class BinaryReader {
    * type.
    */
   readSfixed32(): number {
-    assert(this.nextWireType_ == WireType.FIXED32);
+    assert(this.nextWireType_ == WIRE_TYPE_FIXED32);
     return this.decoder_.readInt32();
   }
 
@@ -691,7 +678,7 @@ export class BinaryReader {
    * type.
    */
   readSfixed32String(): string {
-    assert(this.nextWireType_ == WireType.FIXED32);
+    assert(this.nextWireType_ == WIRE_TYPE_FIXED32);
     return this.decoder_.readInt32().toString();
   }
 
@@ -701,7 +688,7 @@ export class BinaryReader {
    * type
    */
   readSfixed64(): number {
-    assert(this.nextWireType_ == WireType.FIXED64);
+    assert(this.nextWireType_ == WIRE_TYPE_FIXED64);
     return this.decoder_.readInt64();
   }
 
@@ -713,7 +700,7 @@ export class BinaryReader {
    * Returns the value as a string.
    */
   readSfixed64String(): string {
-    assert(this.nextWireType_ == WireType.FIXED64);
+    assert(this.nextWireType_ == WIRE_TYPE_FIXED64);
     return this.decoder_.readInt64String();
   }
 
@@ -722,7 +709,7 @@ export class BinaryReader {
    * error if the next field in the stream is not of the correct wire type.
    */
   readFloat(): number {
-    assert(this.nextWireType_ == WireType.FIXED32);
+    assert(this.nextWireType_ == WIRE_TYPE_FIXED32);
     return this.decoder_.readFloat();
   }
 
@@ -731,7 +718,7 @@ export class BinaryReader {
    * error if the next field in the stream is not of the correct wire type.
    */
   readDouble(): number {
-    assert(this.nextWireType_ == WireType.FIXED64);
+    assert(this.nextWireType_ == WIRE_TYPE_FIXED64);
     return this.decoder_.readDouble();
   }
 
@@ -740,7 +727,7 @@ export class BinaryReader {
    * field in the stream is not of the correct wire type.
    */
   readBool(): boolean {
-    assert(this.nextWireType_ == WireType.VARINT);
+    assert(this.nextWireType_ == WIRE_TYPE_VARINT);
     return !!this.decoder_.readUnsignedVarint32();
   }
 
@@ -749,7 +736,7 @@ export class BinaryReader {
    * field in the stream is not of the correct wire type.
    */
   readEnum(): number {
-    assert(this.nextWireType_ == WireType.VARINT);
+    assert(this.nextWireType_ == WIRE_TYPE_VARINT);
     return this.decoder_.readSignedVarint64();
   }
 
@@ -758,7 +745,7 @@ export class BinaryReader {
    * field in the stream is not of the correct wire type.
    */
   readString(): string {
-    assert(this.nextWireType_ == WireType.DELIMITED);
+    assert(this.nextWireType_ == WIRE_TYPE_DELIMITED);
     const length = this.decoder_.readUnsignedVarint32();
     return this.decoder_.readString(length);
   }
@@ -768,7 +755,7 @@ export class BinaryReader {
    * null if the next field in the stream has an invalid length value.
    */
   readBytes(): Uint8Array {
-    assert(this.nextWireType_ == WireType.DELIMITED);
+    assert(this.nextWireType_ == WIRE_TYPE_DELIMITED);
     const length = this.decoder_.readUnsignedVarint32();
     return this.decoder_.readBytes(length);
   }
@@ -779,7 +766,7 @@ export class BinaryReader {
    * if the next field in the stream is not of the correct wire type.
    */
   readVarintHash64(): string {
-    assert(this.nextWireType_ == WireType.VARINT);
+    assert(this.nextWireType_ == WIRE_TYPE_VARINT);
     return this.decoder_.readVarintHash64();
   }
 
@@ -789,7 +776,7 @@ export class BinaryReader {
    * field in the stream is not of the correct wire type.
    */
   readSintHash64(): string {
-    assert(this.nextWireType_ == WireType.VARINT);
+    assert(this.nextWireType_ == WIRE_TYPE_VARINT);
     return this.decoder_.readZigzagVarintHash64();
   }
 
@@ -799,7 +786,7 @@ export class BinaryReader {
    * of the correct wire type.
    */
   readSplitVarint64<T>(convert: (arg0: number, arg1: number) => T): T {
-    assert(this.nextWireType_ == WireType.VARINT);
+    assert(this.nextWireType_ == WIRE_TYPE_VARINT);
     return this.decoder_.readSplitVarint64(convert);
   }
 
@@ -809,7 +796,7 @@ export class BinaryReader {
    * if the next field in the stream is not of the correct wire type.
    */
   readFixedHash64(): string {
-    assert(this.nextWireType_ == WireType.FIXED64);
+    assert(this.nextWireType_ == WIRE_TYPE_FIXED64);
     return this.decoder_.readFixedHash64();
   }
 
@@ -819,7 +806,7 @@ export class BinaryReader {
    * stream is not of the correct wire type.
    */
   readSplitFixed64<T>(convert: (arg0: number, arg1: number) => T): T {
-    assert(this.nextWireType_ == WireType.FIXED64);
+    assert(this.nextWireType_ == WIRE_TYPE_FIXED64);
     return this.decoder_.readSplitFixed64(convert);
   }
 
@@ -827,7 +814,7 @@ export class BinaryReader {
    * Reads a packed scalar field using the supplied raw reader function.
    */
   readPackedField_<T>(decodeMethod: (this: BinaryDecoder) => T): Array<T> {
-    assert(this.nextWireType_ == WireType.DELIMITED);
+    assert(this.nextWireType_ == WIRE_TYPE_DELIMITED);
     const length = this.decoder_.readUnsignedVarint32();
     const end = this.decoder_.getCursor() + length;
     const result = [];
