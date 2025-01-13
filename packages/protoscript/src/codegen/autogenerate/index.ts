@@ -40,7 +40,7 @@ function writeTypes(types: ProtoTypes[], parents: string[]): string {
 
           const mandatoryOptional = cycleDetected(tsType, [
             ...parents,
-            node.content.name,
+            name,
           ]);
 
           result += `${fieldName}${printIf(optional, "?")}:`;
@@ -66,7 +66,7 @@ function writeTypes(types: ProtoTypes[], parents: string[]): string {
           "export declare",
         )} namespace ${name} { \n`;
         result +=
-          writeTypes(node.children, [...parents, node.content.name]) + "\n\n";
+          writeTypes(node.children, [...parents, name]) + "\n\n";
         result += `}\n\n`;
       }
     }
@@ -91,10 +91,10 @@ function writeProtobufSerializers(
   const isTopLevel = parents.length === 0;
 
   types.forEach((node) => {
-    const ns = node.content.namespacedName;
+    const ns = node.content.namespacedName, name=node.content.name;
     result += isTopLevel
-      ? `export const ${node.content.name} = {`
-      : `${node.content.name}: {`;
+      ? `export const ${name} = {`
+      : `${name}: {`;
 
     switch (node.type) {
       case "message": {
@@ -163,7 +163,7 @@ function writeProtobufSerializers(
                     if (
                       cycleDetected(field.tsType, [
                         ...parents,
-                        node.content.name,
+                        name,
                       ])
                     ) {
                       return `${field.name}: undefined,`;
@@ -293,7 +293,7 @@ function writeProtobufSerializers(
                           node.content.isMap ||
                           cycleDetected(field.tsType, [
                             ...parents,
-                            node.content.name,
+                            name,
                           ])
                         ) {
                           res += `msg.${field.name} = ${field.tsType}.initialize();`;
@@ -352,7 +352,7 @@ function writeProtobufSerializers(
         result += "},\n\n";
         result += writeProtobufSerializers(node.children, [
           ...parents,
-          node.content.name,
+          name,
         ]);
         result += `}${isTopLevel ? ";" : ","}\n\n`;
         break;
@@ -430,11 +430,12 @@ function writeJSONSerializers(types: ProtoTypes[], parents: string[]): string {
   const isTopLevel = parents.length === 0;
 
   types.forEach((node) => {
-    const ns = node.content.namespacedName,
+    const name=node.content.name,
+      ns = node.content.namespacedName,
       nsJSON = node.content.namespacedNameJSON;
     result += isTopLevel
-      ? `export const ${node.content.name}JSON = {`
-      : `${node.content.name}: {`;
+      ? `export const ${name}JSON = {`
+      : `${name}: {`;
 
     switch (node.type) {
       case "message": {
@@ -501,7 +502,7 @@ function writeJSONSerializers(types: ProtoTypes[], parents: string[]): string {
                     if (
                       cycleDetected(field.tsType, [
                         ...parents,
-                        node.content.name,
+                        name,
                       ])
                     ) {
                       return `${field.name}: undefined,`;
@@ -648,7 +649,7 @@ function writeJSONSerializers(types: ProtoTypes[], parents: string[]): string {
                 } else {
                   if (
                     field.optional ||
-                    cycleDetected(field.tsType, [...parents, node.content.name])
+                    cycleDetected(field.tsType, [...parents, name])
                   ) {
                     res += `msg.${field.name} = ${field.tsTypeJSON}.initialize();`;
                   }
@@ -673,7 +674,7 @@ function writeJSONSerializers(types: ProtoTypes[], parents: string[]): string {
         result += "},\n\n";
         result += writeJSONSerializers(node.children, [
           ...parents,
-          node.content.name,
+          name,
         ]);
         result += `}${isTopLevel ? ";" : ","}\n\n`;
         break;
