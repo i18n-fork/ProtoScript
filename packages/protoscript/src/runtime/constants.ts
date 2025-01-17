@@ -38,7 +38,7 @@ export const WIRE_TYPE_FIXED32 = 5;
 // export type WireType = (typeof WireType)[keyof typeof WireType];
 
 /**
- * Translates field type to wire type.
+ * Translates field type to wire.
  */
 export const FieldTypeToWireType = function (fieldType: number): number {
   switch (fieldType) {

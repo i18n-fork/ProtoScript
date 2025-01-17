@@ -1,12 +1,12 @@
 {
-  "name": "protoscript",
-  "version": "0.0.22",
+  "name": "@3-/protoscript",
+  "version": "0.0.39",
   "description": "A Protobuf runtime and code generation tool for JavaScript and TypeScript",
   "license": "MIT",
-  "author": "Tate <tatethurston@gmail.com>",
+  "author": "i18n <i18n.site@gmail.com>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/tatethurston/protoscript"
+    "url": "https://github.com/i18n-fork/ProtoScript"
   },
   "type": "module",
   "main": "./dist/cjs/index.cjs",
@@ -25,6 +25,8 @@
   "sideEffects": false,
   "types": "./dist/index.d.ts",
   "dependencies": {
+    "@3-/snake": "^0.0.3",
+    "@3-/utf8": "^0.0.4",
     "google-protobuf": "^3.21.2",
     "prettier": "^3.0.3"
   },
@@ -41,6 +43,10 @@
       "require": "./dist/cjs/index.cjs",
       "default": "./dist/index.js"
     },
-    "./plugin": "./dist/plugin.js"
+    "./*": "./dist/*"
+  },
+  "devDependencies": {
+    "@types/google-protobuf": "^3.15.12",
+    "@types/jest": "^29.5.14"
   }
 }

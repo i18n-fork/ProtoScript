@@ -1,5 +1,6 @@
 import { assert } from "./goog/asserts.js";
-import { byteArrayToString, stringToUint8Array } from "./goog/crypt.js";
+import byteArrayToString from "@3-/utf8/utf8d.js";
+import stringToUint8Array from "@3-/utf8/utf8e.js";
 import {
   FLOAT32_MAX,
   FLOAT32_MIN,

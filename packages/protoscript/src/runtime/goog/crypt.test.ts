@@ -1,4 +1,5 @@
-import { stringToUint8Array, byteArrayToString } from "./crypt.js";
+import byteArrayToString from "@3-/utf8/utf8d.js";
+import stringToUint8Array from "@3-/utf8/utf8e.js";
 
 const str = "hello 👋";
 const bytes = [104, 101, 108, 108, 111, 32, 240, 159, 145, 139];
