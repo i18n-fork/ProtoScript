@@ -446,7 +446,7 @@ function escapeComment(comment: string): string {
 export function printComments(comment: string): string {
   const lines = escapeComment(comment)
     .split("\n")
-    .map((i) => (i.startsWith("/") ? i.slice(1).trimStart() : i));
+    .map((i) => (i.startsWith("/") ? i.slice(1) : i));
   return `\
     /**
      *${lines.slice(0, -1).join("\n *") + lines.slice(-1).join(" *")}
