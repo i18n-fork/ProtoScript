@@ -618,7 +618,7 @@ export const readInt64 = (self: BinaryReader): number => {
  *
  * Returns the value as a string.
  */
-export const readInt64String = (self: BinaryReader): string => {
+export const readInt64String = (self: BinaryReader): number => {
   assert(self[NEXT_WIRE_TYPE] == WIRE_TYPE_VARINT);
   return _readSignedVarint64String(self[DECODER]);
 };
@@ -658,7 +658,7 @@ export const readUint64 = (self: BinaryReader): number => {
  *
  * Returns the value as a string.
  */
-export const readUint64String = (self: BinaryReader): string => {
+export const readUint64String = (self: BinaryReader): number => {
   assert(self[NEXT_WIRE_TYPE] == WIRE_TYPE_VARINT);
   return _readUnsignedVarint64String(self[DECODER]);
 };
@@ -688,7 +688,7 @@ export const readSint64 = (self: BinaryReader): number => {
  * or throws an error if the next field in the stream is not of the correct
  * wire.
  */
-export const readSint64String = (self: BinaryReader): string => {
+export const readSint64String = (self: BinaryReader): number => {
   assert(self[NEXT_WIRE_TYPE] == WIRE_TYPE_VARINT);
   return _readZigzagVarint64String(self[DECODER]);
 };
@@ -720,7 +720,7 @@ export const readFixed64 = (self: BinaryReader): number => {
  *
  * Returns the value as a string.
  */
-export const readFixed64String = (self: BinaryReader): string => {
+export const readFixed64String = (self: BinaryReader): number => {
   assert(self[NEXT_WIRE_TYPE] == WIRE_TYPE_FIXED64);
   return _readUint64String(self[DECODER]);
 };
@@ -762,7 +762,7 @@ export const readSfixed64 = (self: BinaryReader): number => {
  *
  * Returns the value as a string.
  */
-export const readSfixed64String = (self: BinaryReader): string => {
+export const readSfixed64String = (self: BinaryReader): number => {
   assert(self[NEXT_WIRE_TYPE] == WIRE_TYPE_FIXED64);
   return _readInt64String(self[DECODER]);
 };
@@ -925,7 +925,7 @@ export const readPackedInt64 = (self: BinaryReader): Array<number> => {
  * Reads a packed int64 field, which consists of a length header and a list of
  * signed varints. Returns a list of strings.
  */
-export const readPackedInt64String = (self: BinaryReader): Array<string> => {
+export const readPackedInt64String = (self: BinaryReader): Array<number> => {
   return readPackedField_(self, _readSignedVarint64String);
 };
 
@@ -957,7 +957,7 @@ export const readPackedUint64 = (self: BinaryReader): Array<number> => {
  * Reads a packed uint64 field, which consists of a length header and a list of
  * unsigned varints. Returns a list of strings.
  */
-export const readPackedUint64String = (self: BinaryReader): Array<string> => {
+export const readPackedUint64String = (self: BinaryReader): Array<number> => {
   return readPackedField_(self, _readUnsignedVarint64String);
 };
 
@@ -981,7 +981,7 @@ export const readPackedSint64 = (self: BinaryReader): Array<number> => {
  * Reads a packed sint64 field, which consists of a length header and a list of
  * zigzag varints.  Returns a list of strings.
  */
-export const readPackedSint64String = (self: BinaryReader): Array<string> => {
+export const readPackedSint64String = (self: BinaryReader): Array<number> => {
   return readPackedField_(self, _readZigzagVarint64String);
 };
 
@@ -1005,7 +1005,7 @@ export const readPackedFixed64 = (self: BinaryReader): Array<number> => {
  * Reads a packed fixed64 field, which consists of a length header and a list
  * of unsigned 64-bit ints.  Returns a list of strings.
  */
-export const readPackedFixed64String = (self: BinaryReader): Array<string> => {
+export const readPackedFixed64String = (self: BinaryReader): Array<number> => {
   return readPackedField_(self, _readUint64String);
 };
 
@@ -1029,7 +1029,7 @@ export const readPackedSfixed64 = (self: BinaryReader): Array<number> => {
  * Reads a packed sfixed64 field, which consists of a length header and a list
  * of 64-bit ints.  Returns a list of strings.
  */
-export const readPackedSfixed64String = (self: BinaryReader): Array<string> => {
+export const readPackedSfixed64String = (self: BinaryReader): Array<number> => {
   return readPackedField_(self, _readInt64String);
 };
 

@@ -31,6 +31,7 @@
     "typecheck": "pnpm --recursive run typecheck"
   },
   "dependencies": {
+    "@3-/empty_bin": "^0.1.1",
     "google-protobuf": "^3.21.2"
   },
   "devDependencies": {

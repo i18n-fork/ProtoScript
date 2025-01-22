@@ -487,11 +487,11 @@ export const joinFloat64 = function (
 export const joinUnsignedDecimalString = function (
   bitsLow: number,
   bitsHigh: number,
-): string {
+): number {
   // Skip the expensive conversion if the number is small enough to use the
   // built-in conversions.
   if (bitsHigh <= 0x1fffff) {
-    return joinUint64(bitsLow, bitsHigh).toString();
+    return joinUint64(bitsLow, bitsHigh);
   }
 
   // What this code is doing is essentially converting the input number from
@@ -537,12 +537,12 @@ export const joinUnsignedDecimalString = function (
     return partial;
   }
 
-  return (
+  return Number.parseInt(
     decimalFrom1e7(digitC, 0) +
-    decimalFrom1e7(digitB, digitC) +
-    // If the final 1e7 digit didn't need leading zeros, we would have
-    // returned via the trivial code path at the top.
-    decimalFrom1e7(digitA, 1)
+      decimalFrom1e7(digitB, digitC) +
+      // If the final 1e7 digit didn't need leading zeros, we would have
+      // returned via the trivial code path at the top.
+      decimalFrom1e7(digitA, 1),
   );
 };
 
@@ -553,7 +553,7 @@ export const joinUnsignedDecimalString = function (
 export const joinSignedDecimalString = function (
   bitsLow: number,
   bitsHigh: number,
-): string {
+): number {
   // If we're treating the input as a signed value and the high bit is set, do
   // a manual two's complement conversion before the decimal conversion.
   const negative = bitsHigh & 0x80000000;
@@ -564,5 +564,5 @@ export const joinSignedDecimalString = function (
   }
 
   const result = joinUnsignedDecimalString(bitsLow, bitsHigh);
-  return negative ? "-" + result : result;
+  return negative ? -result : result;
 };

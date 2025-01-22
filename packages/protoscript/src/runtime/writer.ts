@@ -782,7 +782,6 @@ export const writeBytes = (
   if (!value) return;
   const bytes = byteSourceToUint8Array(value),
     length = bytes.length;
-  if (!length) return;
   writeFieldHeader(self, field, WIRE_TYPE_DELIMITED);
   _writeUnsignedVarint32(self[ENCODER], length);
   appendUint8Array_(self, bytes);

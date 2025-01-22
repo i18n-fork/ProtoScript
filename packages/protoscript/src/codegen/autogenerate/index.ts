@@ -313,41 +313,41 @@ const ${ns}New = () => `;
                         res += `_P.readMessage(reader,${msg_pos}, ${field.tsType}Read);`;
                       }
                     } else {
-                      let converter;
+                      // let converter;
                       // if (field.read === "readEnum") {
                       // converter = `${field.tsType}._fromInt`;
                       // } else
-                      if (field.tsType === "bigint") {
-                        converter = "BigInt";
-                      }
+                      // if (field.tsType === "bigint") {
+                      //   converter = "BigInt";
+                      // }
                       if (field.repeated) {
-                        if (converter) {
-                          if (field.readPacked) {
-                            res += `if (_P.isDelimited(reader)) {`;
-                            res += `${msg_pos}.push(..._P.${field.readPacked}(reader).map(${converter}));`;
-                            res += `} else {`;
-                            res += `${msg_pos}.push(${converter}(_P.${field.read}(reader)));`;
-                            res += `}`;
-                          } else {
-                            res += `${msg_pos}.push(${converter}(_P.${field.read}(reader)));`;
-                          }
+                        // if (converter) {
+                        //   if (field.readPacked) {
+                        //     res += `if (_P.isDelimited(reader)) {`;
+                        //     res += `${msg_pos}.push(..._P.${field.readPacked}(reader).map(${converter}));`;
+                        //     res += `} else {`;
+                        //     res += `${msg_pos}.push(${converter}(_P.${field.read}(reader)));`;
+                        //     res += `}`;
+                        //   } else {
+                        //     res += `${msg_pos}.push(${converter}(_P.${field.read}(reader)));`;
+                        //   }
+                        // } else {
+                        if (field.readPacked) {
+                          res += `if (_P.isDelimited(reader)) {`;
+                          res += `${msg_pos}.push(..._P.${field.readPacked}(reader));`;
+                          res += `} else {`;
+                          res += `${msg_pos}.push(_P.${field.read}(reader));`;
+                          res += `}`;
                         } else {
-                          if (field.readPacked) {
-                            res += `if (_P.isDelimited(reader)) {`;
-                            res += `${msg_pos}.push(..._P.${field.readPacked}(reader));`;
-                            res += `} else {`;
-                            res += `${msg_pos}.push(_P.${field.read}(reader));`;
-                            res += `}`;
-                          } else {
-                            res += `${msg_pos}.push(_P.${field.read}(reader));`;
-                          }
+                          res += `${msg_pos}.push(_P.${field.read}(reader));`;
                         }
+                        // }
                       } else {
-                        if (converter) {
-                          res += `${msg_pos} = ${converter}(_P.${field.read}(reader));`;
-                        } else {
-                          res += `${msg_pos} = _P.${field.read}(reader);`;
-                        }
+                        // if (converter) {
+                        //   res += `${msg_pos} = ${converter}(_P.${field.read}(reader));`;
+                        // } else {
+                        res += `${msg_pos} = _P.${field.read}(reader);`;
+                        // }
                       }
                     }
                     res += "break;\n}";
@@ -543,7 +543,7 @@ ${printIf(
 )}
 ${printIf(
   hasSerializer || hasWellKnownTypeImports,
-  'import * as _P from "@3-/protoscript";',
+  'import * as _P from "@3-/protoscript";import EMPTY_BIN from "@3-/empty_bin";',
 )}
 ${printIf(pluginImports.length > 0, pluginImports.join("\n"))}
 ${imports

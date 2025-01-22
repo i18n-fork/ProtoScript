@@ -15,8 +15,6 @@ export type PartialDeep<T> = {
   /* eslint-enable @typescript-eslint/no-explicit-any */
 };
 
-export const EMPTY_BIN = new Uint8Array(0);
-
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export type Encoder = (msg: any, writer: BinaryWriter) => BinaryWriter;
 

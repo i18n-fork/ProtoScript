@@ -432,7 +432,7 @@ export const _readUnsignedVarint64 = (self: BinaryDecoder): number => {
  * Reads an unsigned 64-bit varint from the binary stream and returns the value
  * as a decimal string.
  */
-export const _readUnsignedVarint64String = (self: BinaryDecoder): string => {
+export const _readUnsignedVarint64String = (self: BinaryDecoder): number => {
   return _readSplitVarint64(self, joinUnsignedDecimalString);
 };
 
@@ -449,7 +449,7 @@ export const _readSignedVarint64 = (self: BinaryDecoder): number => {
  * Reads an signed 64-bit varint from the binary stream and returns the value
  * as a decimal string.
  */
-export const _readSignedVarint64String = (self: BinaryDecoder): string => {
+export const _readSignedVarint64String = (self: BinaryDecoder): number => {
   return _readSplitVarint64(self, joinSignedDecimalString);
 };
 
@@ -511,7 +511,7 @@ export const _readZigzagVarintHash64 = (self: BinaryDecoder): string => {
  * storage overhead for small negative integers - for more details on the
  * format, see https://developers.google.com/protocol-buffers/docs/encoding
  */
-export const _readZigzagVarint64String = (self: BinaryDecoder): string => {
+export const _readZigzagVarint64String = (self: BinaryDecoder): number => {
   return readSplitZigzagVarint64(self, joinSignedDecimalString);
 };
 
@@ -565,7 +565,7 @@ export const _readUint64 = (self: BinaryDecoder): number => {
  * Javascript represents all numbers as double-precision floats, there will be
  * precision lost if the absolute value of the integer is larger than 2^53.
  */
-export const _readUint64String = (self: BinaryDecoder): string => {
+export const _readUint64String = (self: BinaryDecoder): number => {
   const bitsLow = _readUint32(self);
   const bitsHigh = _readUint32(self);
   return joinUnsignedDecimalString(bitsLow, bitsHigh);
@@ -620,7 +620,7 @@ export const _readInt64 = (self: BinaryDecoder): number => {
  * Reads a raw signed 64-bit integer from the binary stream and returns it as a
  * string.
  */
-export const _readInt64String = (self: BinaryDecoder): string => {
+export const _readInt64String = (self: BinaryDecoder): number => {
   const bitsLow = _readUint32(self);
   const bitsHigh = _readUint32(self);
   return joinSignedDecimalString(bitsLow, bitsHigh);
