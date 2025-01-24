@@ -543,7 +543,7 @@ ${printIf(
 )}
 ${printIf(
   hasSerializer || hasWellKnownTypeImports,
-  'import * as _P from "@3-/protoscript";import EMPTY_BIN from "@3-/empty_bin";',
+  'import * as _P from "@3-/protoscript";',
 )}
 ${printIf(pluginImports.length > 0, pluginImports.join("\n"))}
 ${imports

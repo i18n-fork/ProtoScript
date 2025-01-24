@@ -342,7 +342,7 @@ export function getDescriptor(
     }
     case FieldDescriptorProto.Type.TYPE_BYTES: {
       return {
-        defaultValue: "EMPTY_BIN",
+        defaultValue: "",
         jsonSerializer: "protoscript.serializeBytes",
         jsonParser: "protoscript.parseBytes",
         map: false,

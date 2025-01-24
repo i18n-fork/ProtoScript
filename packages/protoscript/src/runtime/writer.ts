@@ -770,6 +770,22 @@ export const writeString = (
   endDelimited_(self, bookmark);
 };
 
+const val2bytes = (value: ByteSource): [Uint8Array, number] => {
+  const bytes = byteSourceToUint8Array(value);
+  return [bytes, bytes.length];
+};
+
+const _writeBytes = (
+  self: BinaryWriter,
+  field: number,
+  bytes: Uint8Array,
+  length: number,
+) => {
+  writeFieldHeader(self, field, WIRE_TYPE_DELIMITED);
+  _writeUnsignedVarint32(self[ENCODER], length);
+  appendUint8Array_(self, bytes);
+};
+
 /**
  * Writes an arbitrary byte field to the buffer. Note - to match the behavior
  * of the C++ implementation, empty byte arrays _are_ serialized.
@@ -780,11 +796,10 @@ export const writeBytes = (
   value: ByteSource | null,
 ) => {
   if (!value) return;
-  const bytes = byteSourceToUint8Array(value),
-    length = bytes.length;
-  writeFieldHeader(self, field, WIRE_TYPE_DELIMITED);
-  _writeUnsignedVarint32(self[ENCODER], length);
-  appendUint8Array_(self, bytes);
+  const [bytes, length] = val2bytes(value);
+  if (length) {
+    _writeBytes(self, field, bytes, length);
+  }
 };
 
 /**
@@ -1300,8 +1315,8 @@ export const writeRepeatedBytes = (
   value: Array<ByteSource> | null,
 ) => {
   if (!value) return;
-  for (let i = 0; i < value.length; i++) {
-    writeBytes(self, field, value[i]);
+  for (const item of value) {
+    _writeBytes(self, field, ...val2bytes(item));
   }
 };
 export type WriterFunc<MessageType> = (
